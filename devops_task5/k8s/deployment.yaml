@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: password-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: password-manager
+  template:
+    metadata:
+      labels:
+        app: password-manager
+    spec:
+      containers:
+      - name: password-manager
+        image: password-manager:1.0
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: encryption-key
+              key: ENCRYPTION_KEY
+        volumeMounts:
+        - mountPath: /data
+          name: password-storage
+      volumes:
+      - name: password-storage
+        persistentVolumeClaim:
+          claimName: password-pvc
